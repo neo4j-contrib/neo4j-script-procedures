@@ -1,0 +1,58 @@
+= Neo4j Script Procedures
+
+This project demonstrates how to create dynamic procedures on top of Neo4j's built in ones.
+You can create javascript functions in your database that can be later run using the 'nashorn' engine.
+
+[Note]
+This project requires a Neo4j 3.0.0 snapshot or milestone dependency.
+
+== Operations
+
+The operations are:
+
+.create function
+[source,cypher]
+----
+CALL scripts.function({name}, {code})
+
+{"name" : "users",
+ "code" : "function users() collection(db.findNodes(label('User')))"}
+----
+
+.run function
+[source,cypher]
+----
+CALL scripts.run('users', null)
+
+-> returns one user per row
+----
+
+.list functions
+[source,cypher]
+----
+CALL scripts.list()
+----
+
+.helper functions
+[source,javascript]
+----
+function label(s) { return org.neo4j.graphdb.DynamicLabel.label(s); }
+
+function type(s) { return org.neo4j.graphdb.DynamicRelationshipType.withName(s); }
+
+function collection(it) { r=[]; while (it.hasNext()) r.push(it.next());  return Java.to(r); }
+----
+
+== Building
+
+This project uses maven, to build a jar-file with the procedure in this
+project, simply package the project with maven:
+
+    mvn clean package
+
+This will produce a jar-file,`target/neo4j-javascript-procs-1.0.0-SNAPSHOT.jar`,
+that can be deployed in the `plugin` directory of your Neo4j instance.
+
+== License
+
+Apache License V2, see LICENSE
