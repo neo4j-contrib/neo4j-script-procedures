@@ -79,6 +79,9 @@ public class Scripts {
                 String code = (String) graphProperties().getProperty(name, null);
                 if (code == null)
                     throw new RuntimeException("Function " + name + " not defined, use CALL function('name','code') ");
+                else {
+                    js.eval(code);
+                }
             }
             js.put("db", db);
             js.put("log", log);
