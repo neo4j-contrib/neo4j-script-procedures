@@ -22,6 +22,8 @@ CALL scripts.function({name}, {code})
 .run function
 [source,cypher]
 ----
+CALL scripts.run({name}, {params})
+
 CALL scripts.run('users', null)
 
 -> returns one user per row
@@ -36,9 +38,9 @@ CALL scripts.list()
 .helper functions
 [source,javascript]
 ----
-function label(s) { return org.neo4j.graphdb.DynamicLabel.label(s); }
+function label(s) { return org.neo4j.graphdb.Label.label(s); }
 
-function type(s) { return org.neo4j.graphdb.DynamicRelationshipType.withName(s); }
+function type(s) { return org.neo4j.graphdb.RelationshipType.withName(s); }
 
 function collection(it) { r=[]; while (it.hasNext()) r.push(it.next());  return Java.to(r); }
 ----
