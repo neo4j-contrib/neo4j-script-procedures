@@ -34,6 +34,13 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>net.biville.florent</groupId>
+      <artifactId>neo4j-sproc-compiler</artifactId>
+      <version>1.0-M01</version>
+      <optional>true</optional>
+    </dependency>
+
     <!-- Test Dependencies -->
     <dependency>
       <!-- This is used for a utility that lets us start Neo4j with
