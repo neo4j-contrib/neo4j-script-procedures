@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.core.GraphProperties;
 import org.neo4j.kernel.impl.core.GraphPropertiesProxy;
 import org.neo4j.kernel.impl.core.NodeManager;
