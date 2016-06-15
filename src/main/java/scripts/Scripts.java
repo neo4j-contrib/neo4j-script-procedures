@@ -54,8 +54,8 @@ public class Scripts {
         if (engine.get() == null) {
             ScriptEngine js = new ScriptEngineManager().getEngineByName("nashorn");
             addFunctions(js,
-                    "function label(s) org.neo4j.graphdb.DynamicLabel.label(s)",
-                    "function type(s) org.neo4j.graphdb.DynamicRelationshipType.withName(s)",
+                    "function label(s) org.neo4j.graphdb.Label.label(s)",
+                    "function type(s) org.neo4j.graphdb.RelationshipType.withName(s)",
                     "function collection(it) { r=[]; while (it.hasNext()) r.push(it.next());  return Java.to(r); }");
             engine.set(js);
         }
