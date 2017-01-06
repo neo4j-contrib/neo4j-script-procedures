@@ -11,6 +11,13 @@
   <name>Neo4j Javascript Procedures</name>
 
   <properties>
+    <encoding>UTF-8</encoding>
+    <!-- Neo4j procedures require Java 8 -->
+    <java.version>1.8</java.version>
+    <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
     <neo4j.version>3.0.3</neo4j.version>
   </properties>
 
@@ -25,6 +32,13 @@
       <artifactId>neo4j</artifactId>
       <version>${neo4j.version}</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>net.biville.florent</groupId>
+      <artifactId>neo4j-sproc-compiler</artifactId>
+      <version>1.0-M01</version>
+      <optional>true</optional>
     </dependency>
 
     <!-- Test Dependencies -->
@@ -56,21 +70,14 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <!-- Neo4j Procedures require Java 8 -->
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-      <plugin>
         <!-- This generates a jar-file with our procedure code,
              plus any dependencies marked as `compile` scope.
              This should then be deployed in the `plugins` directory
              of each Neo4j instance in your deployment.
              After a restart, the procedure is available for calling. -->
         <artifactId>maven-shade-plugin</artifactId>
-        <executions>
+        <version>2.4.3</version>
+	<executions>
           <execution>
             <phase>package</phase>
             <goals>

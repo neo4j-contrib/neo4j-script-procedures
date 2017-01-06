@@ -25,3 +25,4 @@ Thumbs.db
 .cache-main
 .cache-tests
 neo4j-home
+dependency-reduced-pom.xml
