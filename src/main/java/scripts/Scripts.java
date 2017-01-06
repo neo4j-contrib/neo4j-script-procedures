@@ -74,17 +74,13 @@ public class Scripts {
     public Stream<Result> run(@Name("name") String name, @Name("params") List params) {
         try {
             ScriptEngine js = getEngine();
-            Object function = js.get(name);
-            if (function == null) {
-                String code = (String) graphProperties().getProperty(name, null);
-                if (code == null)
-                    throw new RuntimeException("Function " + name + " not defined, use CALL function('name','code') ");
-                else {
-                    js.eval(code);
-                }
-            }
+            String code = (String) graphProperties().getProperty(name, null);
+            if (code == null)
+                throw new RuntimeException("Function " + name + " not defined, use CALL function('name','code') ");
+
             js.put("db", db);
             js.put("log", log);
+            js.eval(String.format("function %s(){ return (%s).apply(this, arguments) }", name, code));
             Object value = ((Invocable) js).invokeFunction(name, params == null ? NO_OBJECTS : params.toArray());
             if (value instanceof Object[]) {
                 return Stream.of((Object[]) value).map(Result::new);
@@ -103,7 +99,7 @@ public class Scripts {
     public Stream<Result> function(@Name("name") String name, @Name("code") String code) {
         try {
             ScriptEngine js = getEngine();
-            js.eval(code);
+            js.eval("function(){" + code + "}");
             GraphProperties props = graphProperties();
             boolean replaced = props.hasProperty(name);
             props.setProperty(name, code);
@@ -112,6 +108,15 @@ public class Scripts {
             throw new RuntimeException(e);
         }
     }
+
+    @Procedure
+    @PerformsWrites
+    public Stream<Result> delete(@Name("name") String name) {
+        GraphProperties props = graphProperties();
+        props.removeProperty(name);
+        return Stream.of(new Result(String.format("Function '%s' removed", name)));
+    }
+
 
     @Procedure
     public Stream<Result> list() {
