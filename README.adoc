@@ -18,10 +18,10 @@ The operations are:
 CALL scripts.function({name}, {code})
 
 {"name" : "users",
- "code" : "function users() collection(db.findNodes(label('User')))"}
+ "code" : "function users() { return collection(db.findNodes(label('User'))) }"}
 ----
 
-.run function
+.run function as procedure
 [source,cypher]
 ----
 CALL scripts.run({name}, {params})
@@ -29,6 +29,16 @@ CALL scripts.run({name}, {params})
 CALL scripts.run('users', null)
 
 -> returns one user per row
+----
+
+.run function as function
+[source,cypher]
+----
+RETURN scripts.run({name}, {params})
+
+RETURN scripts.run('users', null)
+
+-> returns a list of users
 ----
 
 .list functions

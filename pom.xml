@@ -3,31 +3,25 @@
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.neo4j.example</groupId>
-  <artifactId>js-procs</artifactId>
+  <groupId>org.neo4j.procedures</groupId>
+  <artifactId>neo4j-script-procedures</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 
   <packaging>jar</packaging>
-  <name>Neo4j Javascript Procedures</name>
+  <name>Neo4j Script Procedures</name>
 
   <properties>
     <encoding>UTF-8</encoding>
-    <!-- Neo4j procedures require Java 8 -->
     <java.version>1.8</java.version>
     <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
     <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <neo4j.version>3.0.3</neo4j.version>
+    <neo4j.version>3.1.1</neo4j.version>
   </properties>
 
   <dependencies>
     <dependency>
-      <!-- This gives us the Procedure API our runtime code uses.
-           We have a `provided` scope on it, because when this is
-           deployed in a Neo4j Instance, the API will be provided
-           by Neo4j. If you add non-Neo4j dependencies to this
-           project, their scope should normally be `compile` -->
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j</artifactId>
       <version>${neo4j.version}</version>
@@ -37,14 +31,12 @@
     <dependency>
       <groupId>net.biville.florent</groupId>
       <artifactId>neo4j-sproc-compiler</artifactId>
-      <version>1.0-M01</version>
+      <version>1.1</version>
       <optional>true</optional>
+      <scope>provided</scope>
     </dependency>
 
-    <!-- Test Dependencies -->
     <dependency>
-      <!-- This is used for a utility that lets us start Neo4j with
-           a specific Procedure, which is nice for writing tests. -->
       <groupId>org.neo4j.test</groupId>
       <artifactId>neo4j-harness</artifactId>
       <version>${neo4j.version}</version>
@@ -52,10 +44,9 @@
     </dependency>
 
     <dependency>
-      <!-- Used to send cypher statements to our procedure. -->
       <groupId>org.neo4j.driver</groupId>
       <artifactId>neo4j-java-driver</artifactId>
-      <version>1.0.3</version>
+      <version>1.2.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -70,14 +61,9 @@
   <build>
     <plugins>
       <plugin>
-        <!-- This generates a jar-file with our procedure code,
-             plus any dependencies marked as `compile` scope.
-             This should then be deployed in the `plugins` directory
-             of each Neo4j instance in your deployment.
-             After a restart, the procedure is available for calling. -->
         <artifactId>maven-shade-plugin</artifactId>
         <version>2.4.3</version>
-	<executions>
+        <executions>
           <execution>
             <phase>package</phase>
             <goals>
@@ -88,20 +74,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <!-- Since there is no stable release of Procedures at the time this
-       is written, we depend on Neo4j Snapshot releases for now. If there
-       is a stable Neo4j release when you read this, this repository has
-       not been properly updated. Please use stable versions for production
-       code - and do consider sending a pull-request bringing this project
-       up to date! -->
-  <repositories>
-    <repository>
-      <id>neo4j-snapshot-repository</id>
-      <name>Maven 2 snapshot repository for Neo4j</name>
-      <url>http://m2.neo4j.org/content/repositories/snapshots</url>
-      <snapshots><enabled>true</enabled></snapshots>
-      <releases><enabled>false</enabled></releases>
-    </repository>
-  </repositories>
 </project>

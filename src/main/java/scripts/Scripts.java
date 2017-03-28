@@ -12,8 +12,10 @@ import org.neo4j.kernel.impl.core.NodeManager;
 import org.neo4j.logging.Log;
 import org.neo4j.procedure.Context;
 import org.neo4j.procedure.Name;
+import org.neo4j.procedure.Mode;
 import org.neo4j.procedure.PerformsWrites;
 import org.neo4j.procedure.Procedure;
+import org.neo4j.procedure.UserFunction;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -22,21 +24,14 @@ import javax.script.ScriptException;
 
 import static org.neo4j.helpers.collection.MapUtil.stringMap;
 
-/**
- * This is an example showing how you could expose Neo4j's full text indexes as
- * two procedures - one for updating indexes, and one for querying by label and
- * the lucene query language.
- */
 public class Scripts {
 
+    private static String PREFIX = "script.function.";
     public static final Object[] NO_OBJECTS = new Object[0];
-    // This field declares that we need a GraphDatabaseService
-    // as context when any procedure in this class is invoked
-    @Context
-    public GraphDatabaseService db;
 
-    // This gives us a log instance that outputs messages to the
-    // standard log, normally found under `data/log/console.log`
+    @Context
+    public GraphDatabaseAPI db;
+
     @Context
     public Log log;
 
@@ -47,7 +42,7 @@ public class Scripts {
 
     private GraphProperties graphProperties() {
         if (graphProperties == NO_GRAPH_PROPERTIES)
-            graphProperties = ((GraphDatabaseAPI) db).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties();
+            graphProperties = db.getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties();
         return graphProperties;
     }
     private ScriptEngine getEngine() {
@@ -70,57 +65,52 @@ public class Scripts {
         }
     }
 
-    @Procedure
-    public Stream<Result> run(@Name("name") String name, @Name("params") List params) {
-        try {
-            ScriptEngine js = getEngine();
-            String code = (String) graphProperties().getProperty(name, null);
-            if (code == null)
-                throw new RuntimeException("Function " + name + " not defined, use CALL function('name','code') ");
+    @UserFunction("scripts.run")
+    public Object runFunction(@Name("name") String name, @Name(value="params",defaultValue="[]") List<Object> params) throws ScriptException, NoSuchMethodException {
+        ScriptEngine js = getEngine();
+        String code = (String) graphProperties().getProperty(PREFIX + name, null);
+        if (code == null)
+            throw new RuntimeException("Function " + name + " not defined, use CALL function('name','code') ");
 
-            js.put("db", db);
-            js.put("log", log);
-            js.eval(String.format("function %s(){ return (%s).apply(this, arguments) }", name, code));
-            Object value = ((Invocable) js).invokeFunction(name, params == null ? NO_OBJECTS : params.toArray());
-            if (value instanceof Object[]) {
-                return Stream.of((Object[]) value).map(Result::new);
-            }
-            if (value instanceof Iterable) {
-                return StreamSupport.stream(((Iterable<?>)value).spliterator(),false).map(Result::new);
-            }
-            return Stream.of(new Result(value));
-        } catch (ScriptException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
+        js.put("db", db);
+        js.put("log", log);
+        js.eval(String.format("function %s(){ return (%s).apply(this, arguments) }", name, code));
+        return ((Invocable) js).invokeFunction(name, params == null ? NO_OBJECTS : params.toArray());
     }
 
     @Procedure
-    @PerformsWrites
-    public Stream<Result> function(@Name("name") String name, @Name("code") String code) {
-        try {
-            ScriptEngine js = getEngine();
-            js.eval("function(){" + code + "}");
-            GraphProperties props = graphProperties();
-            boolean replaced = props.hasProperty(name);
-            props.setProperty(name, code);
-            return Stream.of(new Result(String.format("%s Function %s", replaced ? "Updated" : "Added", name)));
-        } catch (ScriptException e) {
-            throw new RuntimeException(e);
-        }
+    public Stream<Result> run(@Name("name") String name, @Name(value="params",defaultValue="[]") List<Object> params) throws ScriptException, NoSuchMethodException {
+        Object value = runFunction(name, params); 
+        if (value instanceof Object[]) {
+             return Stream.of((Object[]) value).map(Result::new);
+         }
+         if (value instanceof Iterable) {
+             return StreamSupport.stream(((Iterable<?>)value).spliterator(),false).map(Result::new);
+         }
+         return Stream.of(new Result(value));
     }
 
-    @Procedure
-    @PerformsWrites
+    @Procedure(mode=Mode.WRITE)
+    public Stream<Result> function(@Name("name") String name, @Name("code") String code) throws ScriptException {
+        ScriptEngine js = getEngine();
+        js.eval("function(){" + code + "}");
+        GraphProperties props = graphProperties();
+        boolean replaced = props.hasProperty(PREFIX + name);
+        props.setProperty(PREFIX + name, code);
+        return Stream.of(new Result(String.format("%s Function %s", replaced ? "Updated" : "Added", name)));
+    }
+
+    @Procedure(mode=Mode.WRITE)
     public Stream<Result> delete(@Name("name") String name) {
         GraphProperties props = graphProperties();
-        props.removeProperty(name);
+        props.removeProperty(PREFIX + name);
         return Stream.of(new Result(String.format("Function '%s' removed", name)));
     }
 
 
     @Procedure
     public Stream<Result> list() {
-        return StreamSupport.stream(graphProperties.getPropertyKeys().spliterator(), false).map(Result::new);
+        return StreamSupport.stream(graphProperties.getPropertyKeys().spliterator(), false).filter(s -> s.startsWith(PREFIX )).map(Result::new);
     }
 
     public static class Result {
