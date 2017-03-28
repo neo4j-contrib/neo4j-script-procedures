@@ -76,7 +76,7 @@ project, simply package the project with maven:
 
     mvn clean package
 
-This will produce a jar-file,`target/neo4j-script-procedures-1.0.0-SNAPSHOT.jar`, that can be copied in the `$NEO4J_HOME/plugins` directory of your Neo4j instance.
+This will produce a jar-file,`target/neo4j-script-procedures-*-SNAPSHOT.jar`, that can be copied in the `$NEO4J_HOME/plugins` directory of your Neo4j instance.
 
 == License
 
