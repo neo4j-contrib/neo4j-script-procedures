@@ -1,5 +1,7 @@
 = Neo4j Script Procedures
 
+image:https://travis-ci.org/neo4j-contrib/neo4j-script-procedures.svg?branch=3.1["Build Status", link="https://travis-ci.org/neo4j-contrib/neo4j-script-procedures"]
+
 This project demonstrates how to create dynamic procedures on top of Neo4j's built in ones.
 You can create javascript functions in your database that can be later run using the 'nashorn' engine.
 
