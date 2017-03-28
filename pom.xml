@@ -5,7 +5,7 @@
 
   <groupId>org.neo4j.procedures</groupId>
   <artifactId>neo4j-script-procedures</artifactId>
-  <version>3.1.0.1</version>
+  <version>3.1.0.2-SNAPSHOT</version>
 
   <packaging>jar</packaging>
   <name>Neo4j Script Procedures</name>
