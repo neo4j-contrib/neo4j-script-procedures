@@ -15,7 +15,7 @@ import static org.neo4j.driver.v1.Values.parameters;
 public class ScriptsTest
 {
     @Rule
-    public Neo4jRule neo4j = new Neo4jRule().withProcedure( Scripts.class ).withFunction( Scripts.class );
+    public Neo4jRule neo4j = new Neo4jRule().withConfig("dbms.security.procedures.unrestricted","scripts.*").withProcedure( Scripts.class ).withFunction( Scripts.class );
 
     @Test
     public void shouldAllowCreatingAndRunningJSProcedures() throws Throwable
