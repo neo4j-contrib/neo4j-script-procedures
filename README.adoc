@@ -7,13 +7,14 @@ This project demonstrates how to create dynamic procedures and functions on top 
 You can create JavaScript functions in your database that can be later run using the 'nashorn' engine.
 
 [Note]
-This project requires Neo4j 3.1.x (not 3.1.2 though)
+This project requires Neo4j 3.x
 
 == Installation
 
 1. Download the jar from the http://github.com/neo4j-contrib/neo4j-script-procedures/releases/latest[latest release]
 2. Copy it into your `$NEO4J_HOME/plugins` directory.
-3. Restart your server.
+3. Add `dbms.security.procedures.unrestricted=scripts.*` to `$NEO4J_HOME/conf/neo4j.conf`
+4. Restart your server.
 
 == Operations
 
