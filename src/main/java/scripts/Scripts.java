@@ -6,9 +6,9 @@ import java.util.stream.StreamSupport;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
+import org.neo4j.kernel.impl.core.EmbeddedProxySPI;
 import org.neo4j.kernel.impl.core.GraphProperties;
 import org.neo4j.kernel.impl.core.GraphPropertiesProxy;
-import org.neo4j.kernel.impl.core.NodeManager;
 import org.neo4j.logging.Log;
 import org.neo4j.procedure.Context;
 import org.neo4j.procedure.Name;
@@ -42,7 +42,7 @@ public class Scripts {
 
     private GraphProperties graphProperties() {
         if (graphProperties == NO_GRAPH_PROPERTIES)
-            graphProperties = db.getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties();
+            graphProperties = this.db.getDependencyResolver().resolveDependency(EmbeddedProxySPI.class).newGraphPropertiesProxy();
         return graphProperties;
     }
     private ScriptEngine getEngine() {

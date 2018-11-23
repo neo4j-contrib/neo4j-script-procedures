@@ -5,7 +5,7 @@
 
   <groupId>org.neo4j.procedures</groupId>
   <artifactId>neo4j-script-procedures</artifactId>
-  <version>3.3.0</version>
+  <version>3.4.0</version>
 
   <packaging>jar</packaging>
   <name>Neo4j Script Procedures</name>
@@ -17,7 +17,7 @@
     <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <neo4j.version>3.3.9</neo4j.version>
+    <neo4j.version>3.4.10</neo4j.version>
   </properties>
 
   <dependencies>
